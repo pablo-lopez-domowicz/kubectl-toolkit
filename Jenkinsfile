@@ -15,7 +15,6 @@ pipeline {
     stage('Starting') {
       steps {
         sh ./restartService.sh
-        echo "${env.TARGET_REGION} ${env.TARGET_ENVIRONMENT}"
         echo "Done"
       }
     }
