@@ -3,6 +3,7 @@ pipeline {
   parameters {
       choice(name: 'TARGET_ENVIRONMENT',
           choices: 'develop\nstage',
+          defaultValue: 'develop',
           description: 'The environment to deploy to (develop, stage).')
 
       // string(name: 'ENVIRONMENT', defaultValue: "${env.BRANCH_NAME.replaceAll('^origin/', '').replaceAll('/', '-')}-SNAPSHOT",
@@ -10,6 +11,7 @@ pipeline {
 
       choice(name: 'TARGET_REGION',
           choices: 'us-east-1',
+          defaultValue: 'us-east-1',
           description: 'The region to deploy to (only us-east-1 for now).')
 
 
