@@ -1,6 +1,8 @@
 def AWS_ROLE="arn:aws:iam::404675694124:role/UAT_Administrator"
 pipeline {
-  agent any
+  agent anyagent {
+        label 'mcpi-k8s-build'
+    }
   parameters {
       choice(name: 'CLUSTER',
           choices: 'pi-dev-eks\nperf-insights-stage-eks',
