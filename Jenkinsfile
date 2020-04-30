@@ -21,14 +21,14 @@ pipeline {
           if(${env.CLUSTER}.contains("dev")){
             AWS_ROLE="arn:aws:iam::927571343313:role/DevelopmentPerformanceInsights_Administrator"
           }
-          sh "echo "Cluster: ${CLUSTER} - Region: ${TARGET_REGION} - Service: ${TARGET_SERVICE} -- AS: ${AWS_ROLE}""
+          sh """ echo "Cluster: ${CLUSTER} - Region: ${TARGET_REGION} - Service: ${TARGET_SERVICE} -- AS: ${AWS_ROLE}" """
         }
       }
     }
     stage("Executing") {
       steps {
         script {
-          sh "echo "124 Cluster: ${CLUSTER} - Region: ${TARGET_REGION} - Service: ${TARGET_SERVICE} -- AS: ${AWS_ROLE}""
+          sh """ echo " ZZZZ Cluster: ${CLUSTER} - Region: ${TARGET_REGION} - Service: ${TARGET_SERVICE} -- AS: ${AWS_ROLE}" """
         }
       }
     }
