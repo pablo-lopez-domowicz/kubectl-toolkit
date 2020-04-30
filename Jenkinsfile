@@ -28,7 +28,17 @@ pipeline {
     stage("Executing") {
       steps {
         script {
-          sh """ echo "Cluster: ${CLUSTER} - Region: ${TARGET_REGION} - Service: ${TARGET_SERVICE} -- AS: ${AWS_ROLE}" """
+          sh """ echo "XYZ Cluster: ${CLUSTER} - Region: ${TARGET_REGION} - Service: ${TARGET_SERVICE} -- AS: ${AWS_ROLE}" """
+
+          withCredentials([
+              usernamePassword(credentialsId: 'perf_ins_okta_credentials', usernameVariable: 'OKTA_USERNAME', passwordVariable: 'OKTA_PASSWORD'),
+              usernamePassword(credentialsId: 'mcpi-artifactory-key-ro', usernameVariable: 'ARTIF_USERNAME', passwordVariable: 'ARTIF_PASSWORD')]) {
+                  withEnv(["OKTA_USERNAME=${OKTA_USERNAME}", "OKTA_PASSWORD=${OKTA_PASSWORD}", "AWS_DEFAULT_REGION=${REGION}"]) {
+                      sh "gimme-aws-creds --role $AWS_ROLE"
+                      sh "aws eks update-kubeconfig --name $CLUSTER"
+
+            }
+          }
         }
       }
     }
