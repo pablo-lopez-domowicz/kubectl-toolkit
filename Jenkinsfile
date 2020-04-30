@@ -36,6 +36,7 @@ pipeline {
               description: 'Service to restart')
   }
   stages {
+    
     stage('Setting vars') {
       steps {
         script {
@@ -47,6 +48,7 @@ pipeline {
         }
       }
     }
+
     stage("Executing") {
       steps {
         script {
