@@ -14,7 +14,7 @@ pipeline {
   stages {
     stage('Starting') {
       steps {
-        sh ./restartService.sh
+        sh "./restartService.sh"
         echo "Done"
       }
     }
