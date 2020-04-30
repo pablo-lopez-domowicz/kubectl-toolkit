@@ -15,7 +15,7 @@ pipeline {
           description: 'The region to deploy to (only us-east-1 for now).')
 
       choice(name: 'TARGET_SERVICE',
-              choices: 'mcpi-ui\n
+              choices: """mcpi-ui\n
                         aggregation-engine\n
                         audience\n
                         authentication\n
@@ -32,7 +32,7 @@ pipeline {
                         warehouse-metadata\n
                         workspace\n
                         workspace-template\n
-                        ',
+                        """,
               description: 'Service to restart')
   }
   stages {
