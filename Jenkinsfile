@@ -13,7 +13,7 @@ pipeline {
   stages {
     stage('Setting vars') {
       steps {
-        if (("$CLUSTER" == *"dev"*)) {
+        if ($CLUSTER.contains("dev")) {
           AWS_ROLE="arn:aws:iam::927571343313:role/DevelopmentPerformanceInsights_Administrator"
         }
 
