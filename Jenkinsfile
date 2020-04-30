@@ -18,7 +18,7 @@ pipeline {
     stage('Setting vars') {
       steps {
         script {
-          if(${env.CLUSTER}.contains("dev")){
+          if(env.CLUSTER.contains("dev")){
             AWS_ROLE="arn:aws:iam::927571343313:role/DevelopmentPerformanceInsights_Administrator"
           }
           sh """ echo "Cluster: ${CLUSTER} - Region: ${TARGET_REGION} - Service: ${TARGET_SERVICE} -- AS: ${AWS_ROLE}" """
