@@ -17,7 +17,7 @@ pipeline {
   stages {
     stage('Setting vars') {
       steps {
-        if (params.CLUSTER.contains("dev")) {
+        if(params.CLUSTER.contains("dev")){
           AWS_ROLE="arn:aws:iam::927571343313:role/DevelopmentPerformanceInsights_Administrator"
         }
         echo "xxxx Cluster: ${CLUSTER} - Region: ${TARGET_REGION} - Service: ${TARGET_SERVICE} -- AS: ${AWS_ROLE}"
