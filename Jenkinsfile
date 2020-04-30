@@ -38,7 +38,7 @@ pipeline {
 
                                 sh "gimme-aws-creds --role ${AWS_ROLE}"
                                 sh "aws eks update-kubeconfig --name ${TARGET_CLUSTER}"
-                                bash -x restartService.sh ${TARGET_CLUSTER} ${TARGET_REGION} ${TARGET_SERVICE}
+                                sh "bash -x restartService.sh ${TARGET_CLUSTER} ${TARGET_REGION} ${TARGET_SERVICE}"
             }
           }
         }
