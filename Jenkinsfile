@@ -28,7 +28,7 @@ pipeline {
     stage("Executing") {
       steps {
         script {
-          sh """ echo " ZZZZ Cluster: ${CLUSTER} - Region: ${TARGET_REGION} - Service: ${TARGET_SERVICE} -- AS: ${AWS_ROLE}" """
+          // sh """ echo " ZZZZ Cluster: ${CLUSTER} - Region: ${TARGET_REGION} - Service: ${TARGET_SERVICE} -- AS: ${AWS_ROLE}" """
         }
       }
     }
