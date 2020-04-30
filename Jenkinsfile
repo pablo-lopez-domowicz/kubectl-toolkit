@@ -38,7 +38,7 @@ pipeline {
                             withEnv(["OKTA_USERNAME=${OKTA_USERNAME}", "OKTA_PASSWORD=${OKTA_PASSWORD}", "AWS_DEFAULT_REGION=${TARGET_REGION}"]) {
                                 sh "gimme-aws-creds --role ${AWS_ROLE}"
                                 sh "aws eks update-kubeconfig --name ${TARGET_CLUSTER}"
-                                sh "./restartingService.sh" $TARGET_CLUSTER $TARGET_REGION $TARGET_SERVICE
+                                sh "./restartService.sh" $TARGET_CLUSTER $TARGET_REGION $TARGET_SERVICE
 
 
             }
