@@ -17,7 +17,7 @@ pipeline {
   stages {
     stage('Starting') {
       steps {
-        echo ${env.TARGET_REGION} ${env.TARGET_ENVIRONMENT}
+        echo "${env.TARGET_REGION} ${env.TARGET_ENVIRONMENT}"
         echo "Done"
       }
     }
