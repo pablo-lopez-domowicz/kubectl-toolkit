@@ -1,3 +1,4 @@
+def AWS_ROLE="arn:aws:iam::404675694124:role/UAT_Administrator"
 pipeline {
   agent any
   parameters {
@@ -12,7 +13,6 @@ pipeline {
   stages {
     stage('Setting vars') {
       steps {
-        def AWS_ROLE="arn:aws:iam::404675694124:role/UAT_Administrator"
         if (env.BRANCH_NAME == 'master') {
           AWS_ROLE="arn:aws:iam::927571343313:role/DevelopmentPerformanceInsights_Administrator"
         }
