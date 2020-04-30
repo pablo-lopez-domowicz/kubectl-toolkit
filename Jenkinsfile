@@ -29,6 +29,7 @@ pipeline {
       steps {
         script {
           // sh """ echo " ZZZZ Cluster: ${CLUSTER} - Region: ${TARGET_REGION} - Service: ${TARGET_SERVICE} -- AS: ${AWS_ROLE}" """
+            echo "wtf"
         }
       }
     }
