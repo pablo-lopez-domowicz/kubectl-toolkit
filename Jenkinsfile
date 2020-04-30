@@ -8,8 +8,6 @@ pipeline {
       choice(name: 'TARGET_REGION',
           choices: 'us-east-1',
           description: 'The region to deploy to (only us-east-1 for now).')
-
-
   }
   stages {
     stage('Setting vars') {
@@ -30,6 +28,7 @@ pipeline {
                 withEnv(["OKTA_USERNAME=${OKTA_USERNAME}", "OKTA_PASSWORD=${OKTA_PASSWORD}", "AWS_DEFAULT_REGION=${REGION}"]) {
                     sh "gimme-aws-creds --role $AWS_ROLE"
                     sh "aws eks update-kubeconfig --name $CLUSTER"
+          }
         }
       }
     }
