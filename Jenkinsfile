@@ -8,7 +8,7 @@ pipeline {
       // string(name: 'ENVIRONMENT', defaultValue: "${env.BRANCH_NAME.replaceAll('^origin/', '').replaceAll('/', '-')}-SNAPSHOT",
       //         description: "Development version to use in maven artifacts and in image names.")
 
-      choice(name: 'REGION',
+      choice(name: 'TARGET_REGION',
           choices: 'us-east-1',
           description: 'The region to deploy to (only us-east-1 for now).')
 
@@ -17,7 +17,8 @@ pipeline {
   stages {
     stage('Starting') {
       steps {
-        echo "Hi again"
+        echo "Hi again" ${env.TARGET_REGION} ${env.TARGET_ENVIRONMENT}
+        echo "Done"
       }
     }
   }
