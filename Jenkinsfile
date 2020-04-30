@@ -12,22 +12,25 @@ pipeline {
 
   }
   stages {
-    stage('Starting') {
+    stage('Setting vars') {
       steps {
-        AWS_ROLE="arn:aws:iam::404675694124:role/UAT_Administrator"
-        if [[ "$CLUSTER" == *"dev"* ]]; then
+        def AWS_ROLE="arn:aws:iam::404675694124:role/UAT_Administrator"
+        if (env.BRANCH_NAME == 'master') {
           AWS_ROLE="arn:aws:iam::927571343313:role/DevelopmentPerformanceInsights_Administrator"
-        fi
+        }
 
-        echo "**Restarting** Cluster: $CLUSTER - Region: $REGION - Service: $SERVICE -- AS: $AWS_ROLE"
+      }
+    }
+    stage("Executing") {
+      steps {
+        echo "xxxx Cluster: $CLUSTER - Region: $REGION - Service: $SERVICE -- AS: $AWS_ROLE"
         withCredentials([
             usernamePassword(credentialsId: 'perf_ins_okta_credentials', usernameVariable: 'OKTA_USERNAME', passwordVariable: 'OKTA_PASSWORD'),
             usernamePassword(credentialsId: 'mcpi-artifactory-key-ro', usernameVariable: 'ARTIF_USERNAME', passwordVariable: 'ARTIF_PASSWORD')]) {
                 withEnv(["OKTA_USERNAME=${OKTA_USERNAME}", "OKTA_PASSWORD=${OKTA_PASSWORD}", "AWS_DEFAULT_REGION=${REGION}"]) {
-                    gimme-aws-creds --role $AWS_ROLE
-                    aws eks update-kubeconfig --name $CLUSTER
+                    sh "gimme-aws-creds --role $AWS_ROLE"
+                    sh "aws eks update-kubeconfig --name $CLUSTER"
         }
-        echo "Done"
       }
     }
   }
