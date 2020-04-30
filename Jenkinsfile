@@ -1,12 +1,9 @@
 pipeline {
   agent any
   parameters {
-      choice(name: 'TARGET_ENVIRONMENT',
-          choices: 'develop\nstage',
-          description: 'The environment to deploy to (develop, stage).')
-
-      // string(name: 'ENVIRONMENT', defaultValue: "${env.BRANCH_NAME.replaceAll('^origin/', '').replaceAll('/', '-')}-SNAPSHOT",
-      //         description: "Development version to use in maven artifacts and in image names.")
+      choice(name: 'CLUSTER',
+          choices: 'pi-dev-eks\nperf-insights-stage-eks',
+          description: 'The cluster to deploy to (develop, stage).')
 
       choice(name: 'TARGET_REGION',
           choices: 'us-east-1',
@@ -17,6 +14,7 @@ pipeline {
   stages {
     stage('Starting') {
       steps {
+        sh ./restartService.sh
         echo "${env.TARGET_REGION} ${env.TARGET_ENVIRONMENT}"
         echo "Done"
       }
