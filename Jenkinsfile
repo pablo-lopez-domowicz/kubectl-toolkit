@@ -36,7 +36,7 @@ pipeline {
               description: 'Service to restart')
   }
   stages {
-    
+
     stage('Setting vars') {
       steps {
         script {
@@ -57,7 +57,7 @@ pipeline {
                         usernamePassword(credentialsId: 'perf_ins_okta_credentials', usernameVariable: 'OKTA_USERNAME', passwordVariable: 'OKTA_PASSWORD'),
                         usernamePassword(credentialsId: 'mcpi-artifactory-key-ro', usernameVariable: 'ARTIF_USERNAME', passwordVariable: 'ARTIF_PASSWORD')]) {
                             withEnv(["OKTA_USERNAME=${OKTA_USERNAME}", "OKTA_PASSWORD=${OKTA_PASSWORD}", "AWS_DEFAULT_REGION=${TARGET_REGION}"]) {
-                                sh "bash -x restartService.sh ${TARGET_CLUSTER} ${TARGET_REGION} ${TARGET_SERVICE} ${NAMESPACE}" 
+                                sh "bash -x restartService.sh ${TARGET_CLUSTER} ${TARGET_REGION} ${TARGET_SERVICE} ${NAMESPACE} ${AWS_ROLE}" 
             }
           }
         }
