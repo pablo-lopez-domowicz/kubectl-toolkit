@@ -7,12 +7,16 @@ pipeline {
     }
   parameters {
       choice(name: 'FRIENDLY_CLUSTER',
-          choices: 'DEV\nSTAGE',
-          description: 'The cluster to deploy to (develop, stage).')
+          choices: 'Dev\nStage\nProd',
+          description: 'The cluster to deploy to (develop, stage, prod).')
 
       choice(name: 'TARGET_REGION',
           choices: 'us-east-1',
           description: 'The region to deploy to (only us-east-1 for now).')
+
+      choice(name: 'TARGET_ACTION',
+          choices: 'Scan\nRestart',
+          description: 'Select an action (Scan or restart)')
 
       choice(name: 'TARGET_SERVICE',
               choices: """mcpi-ui\n
@@ -40,10 +44,17 @@ pipeline {
     stage('Setting vars') {
       steps {
         script {
-          if(env.FRIENDLY_CLUSTER.contains("STAGE")){
+          if(env.FRIENDLY_CLUSTER.contains("Stage")){
+            echo "Stage selected"
             AWS_ROLE="arn:aws:iam::404675694124:role/UAT_Administrator"
             NAMESPACE="staging-istio"
             TARGET_CLUSTER="perf-insights-stage-eks"
+          }
+          if(env.FRIENDLY_CLUSTER.contains("Prod")){
+            echo "Prod selected"
+            AWS_ROLE="arn:aws:iam::379236661308:role/ProductionShared_Administrator"
+            NAMESPACE="prod"
+            TARGET_CLUSTER="perf-insights-prod-eks"
           }
         }
       }
@@ -57,7 +68,7 @@ pipeline {
                         usernamePassword(credentialsId: 'perf_ins_okta_credentials', usernameVariable: 'OKTA_USERNAME', passwordVariable: 'OKTA_PASSWORD'),
                         usernamePassword(credentialsId: 'mcpi-artifactory-key-ro', usernameVariable: 'ARTIF_USERNAME', passwordVariable: 'ARTIF_PASSWORD')]) {
                             withEnv(["OKTA_USERNAME=${OKTA_USERNAME}", "OKTA_PASSWORD=${OKTA_PASSWORD}", "AWS_DEFAULT_REGION=${TARGET_REGION}"]) {
-                                sh "bash -x restartService.sh ${TARGET_CLUSTER} ${TARGET_REGION} ${TARGET_SERVICE} ${NAMESPACE} ${AWS_ROLE}" 
+                                sh "bash -x restartService.sh ${TARGET_CLUSTER} ${TARGET_REGION} ${TARGET_SERVICE} ${NAMESPACE} ${AWS_ROLE} ${TARGET_ACTION}" 
             }
           }
         }
