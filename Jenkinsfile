@@ -1,6 +1,8 @@
+// default options set to DEV env
 def AWS_ROLE="arn:aws:iam::927571343313:role/DevelopmentPerformanceInsights_Administrator"
 def NAMESPACE="dev"
 def TARGET_CLUSTER="pi-dev-eks"
+def TARGET_REGION="us-east-1"
 pipeline {
   agent {
         label 'mcpi-k8s-build'
@@ -10,9 +12,9 @@ pipeline {
           choices: 'Dev\nStage\nProd',
           description: 'The cluster to deploy to (develop, stage, prod).')
 
-      choice(name: 'TARGET_REGION',
-          choices: 'us-east-1',
-          description: 'The region to deploy to (only us-east-1 for now).')
+      // choice(name: 'TARGET_REGION',
+      //     choices: 'us-east-1',
+      //     description: 'The region to deploy to (only us-east-1 for now).')
 
       choice(name: 'TARGET_ACTION',
           choices: 'Scan\nRestart',
@@ -40,7 +42,6 @@ pipeline {
               description: 'Service to restart')
   }
   stages {
-
     stage('Setting vars') {
       steps {
         script {
@@ -70,6 +71,21 @@ pipeline {
                                 sh "bash -x restartService.sh ${TARGET_CLUSTER} ${TARGET_REGION} ${TARGET_SERVICE} ${NAMESPACE} ${AWS_ROLE} ${TARGET_ACTION}" 
             }
           }
+        }
+      }
+    }
+
+    stage("Post build") {
+      steps {
+        script {
+          echo 123
+          publishHTML (target : [allowMissing: false,
+            alwaysLinkToLastBuild: true,
+            keepAll: true,
+            reportDir: '',
+            reportFiles: 'index.html',
+            reportName: 'My Reports',
+            reportTitles: 'The Report'])
         }
       }
     }
