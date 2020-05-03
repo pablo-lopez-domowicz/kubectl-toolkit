@@ -45,17 +45,16 @@ pipeline {
       steps {
         script {
           if(env.FRIENDLY_CLUSTER.contains("Stage")){
-            echo "Stage selected"
             AWS_ROLE="arn:aws:iam::404675694124:role/UAT_Administrator"
             NAMESPACE="staging-istio"
             TARGET_CLUSTER="perf-insights-stage-eks"
           }
           if(env.FRIENDLY_CLUSTER.contains("Prod")){
-            echo "Prod selected"
             AWS_ROLE="arn:aws:iam::379236661308:role/ProductionShared_Administrator"
             NAMESPACE="prod"
             TARGET_CLUSTER="perf-insights-prod-eks"
           }
+          currentBuild.displayName = "#${currentBuild.number}: ${TARGET_ACTION} - ${FRIENDLY_CLUSTER} - ${TARGET_SERVICE}"
         }
       }
     }
@@ -63,7 +62,7 @@ pipeline {
     stage("Executing") {
       steps {
         script {
-          sh """ echo "XYZ Cluster: ${TARGET_CLUSTER} - Region: ${TARGET_REGION} - Service: ${TARGET_SERVICE} -- AS: ${AWS_ROLE}" """
+          sh """ echo "Cluster: ${TARGET_CLUSTER} - Region: ${TARGET_REGION} - Service: ${TARGET_SERVICE} -- AS: ${AWS_ROLE}" """
           withCredentials([
                         usernamePassword(credentialsId: 'perf_ins_okta_credentials', usernameVariable: 'OKTA_USERNAME', passwordVariable: 'OKTA_PASSWORD'),
                         usernamePassword(credentialsId: 'mcpi-artifactory-key-ro', usernameVariable: 'ARTIF_USERNAME', passwordVariable: 'ARTIF_PASSWORD')]) {
