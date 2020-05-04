@@ -35,6 +35,7 @@ pipeline {
                         ubx-registration\n
                         unique-fact\n
                         warehouse-load\n
+                        warehouse-load-job\n
                         warehouse-metadata\n
                         workspace\n
                         workspace-template\n
