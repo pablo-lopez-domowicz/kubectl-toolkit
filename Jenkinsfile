@@ -78,15 +78,14 @@ pipeline {
     stage("Post build") {
       steps {
         script {
-          echo "123"
           publishHTML (target : [
             allowMissing: false,
             alwaysLinkToLastBuild: true,
             keepAll: true,
             reportDir: '',
-            reportFiles: 'index.html',
-            reportName: 'My Reports',
-            reportTitles: 'The Report'])
+            reportFiles: 'data.json',
+            reportName: 'Scan results',
+            reportTitles: 'Scan results'])
         }
       }
     }
