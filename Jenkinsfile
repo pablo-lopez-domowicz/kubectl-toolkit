@@ -85,9 +85,17 @@ pipeline {
             alwaysLinkToLastBuild: true,
             keepAll: true,
             reportDir: '',
+            reportFiles: 'index.html',
+            reportName: 'Scan results',
+            reportTitles: 'Scan results - html'])
+          publishHTML (target : [
+            allowMissing: false,
+            alwaysLinkToLastBuild: true,
+            keepAll: true,
+            reportDir: '',
             reportFiles: 'data.json',
             reportName: 'Scan results',
-            reportTitles: 'Scan results'])
+            reportTitles: 'Scan results - json'])
         }
       }
     }
