@@ -9,7 +9,7 @@ ACTION=$6
 
 gimme-aws-creds --role $AWS_ROLE
 aws eks update-kubeconfig --name $CLUSTER
-kubectl get pods -n $NAMESPACE -o wide
+kubectl get pods -n $NAMESPACE
 kubectl get pods -n $NAMESPACE -o json > data.json
 
 if [[ "$ACTION" == "Restart" ]]; then
