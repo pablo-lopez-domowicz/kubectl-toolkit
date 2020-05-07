@@ -14,35 +14,7 @@ pipeline {
           choices: 'Dev\nStage\nProd',
           description: 'The cluster to deploy to (develop, stage, prod).')
 
-      // choice(name: 'TARGET_REGION',
-      //     choices: 'us-east-1',
-      //     description: 'The region to deploy to (only us-east-1 for now).')
-
-      // choice(name: 'TARGET_ACTION',
-      //     choices: 'Scan\nRestart',
-      //     description: 'Select an action (Scan or restart)')
-
-      // choice(name: 'TARGET_SERVICE',
-      //         choices: """mcpi-ui\n
-      //                   aggregation-engine\n
-      //                   audience\n
-      //                   authentication\n
-      //                   data-generator\n
-      //                   data-location\n
-      //                   dimension\n
-      //                   provisioning\n
-      //                   query-engine\n
-      //                   ubx-audience-job\n
-      //                   ubx-client\n
-      //                   ubx-registration\n
-      //                   unique-fact\n
-      //                   warehouse-load\n
-      //                   warehouse-load-job\n
-      //                   warehouse-metadata\n
-      //                   workspace\n
-      //                   workspace-template\n
-      //                   """,
-      //         description: 'Service to restart')
+      
   }
   stages {
     stage('Setting vars') {
@@ -58,7 +30,6 @@ pipeline {
             NAMESPACE="prod"
             TARGET_CLUSTER="perf-insights-prod-eks"
           }
-          currentBuild.displayName = "#${currentBuild.number}: ${TARGET_ACTION} - ${FRIENDLY_CLUSTER} - ${TARGET_SERVICE}"
         }
       }
     }
