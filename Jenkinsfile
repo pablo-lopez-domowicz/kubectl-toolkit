@@ -4,6 +4,7 @@ def NAMESPACE="dev"
 def TARGET_CLUSTER="pi-dev-eks"
 def TARGET_REGION="us-east-1"
 
+
 pipeline {
   agent {
         label 'mcpi-k8s-build'
@@ -17,31 +18,31 @@ pipeline {
       //     choices: 'us-east-1',
       //     description: 'The region to deploy to (only us-east-1 for now).')
 
-      choice(name: 'TARGET_ACTION',
-          choices: 'Scan\nRestart',
-          description: 'Select an action (Scan or restart)')
+      // choice(name: 'TARGET_ACTION',
+      //     choices: 'Scan\nRestart',
+      //     description: 'Select an action (Scan or restart)')
 
-      choice(name: 'TARGET_SERVICE',
-              choices: """mcpi-ui\n
-                        aggregation-engine\n
-                        audience\n
-                        authentication\n
-                        data-generator\n
-                        data-location\n
-                        dimension\n
-                        provisioning\n
-                        query-engine\n
-                        ubx-audience-job\n
-                        ubx-client\n
-                        ubx-registration\n
-                        unique-fact\n
-                        warehouse-load\n
-                        warehouse-load-job\n
-                        warehouse-metadata\n
-                        workspace\n
-                        workspace-template\n
-                        """,
-              description: 'Service to restart')
+      // choice(name: 'TARGET_SERVICE',
+      //         choices: """mcpi-ui\n
+      //                   aggregation-engine\n
+      //                   audience\n
+      //                   authentication\n
+      //                   data-generator\n
+      //                   data-location\n
+      //                   dimension\n
+      //                   provisioning\n
+      //                   query-engine\n
+      //                   ubx-audience-job\n
+      //                   ubx-client\n
+      //                   ubx-registration\n
+      //                   unique-fact\n
+      //                   warehouse-load\n
+      //                   warehouse-load-job\n
+      //                   warehouse-metadata\n
+      //                   workspace\n
+      //                   workspace-template\n
+      //                   """,
+      //         description: 'Service to restart')
   }
   stages {
     stage('Setting vars') {
@@ -70,7 +71,9 @@ pipeline {
                         usernamePassword(credentialsId: 'perf_ins_okta_credentials', usernameVariable: 'OKTA_USERNAME', passwordVariable: 'OKTA_PASSWORD'),
                         usernamePassword(credentialsId: 'mcpi-artifactory-key-ro', usernameVariable: 'ARTIF_USERNAME', passwordVariable: 'ARTIF_PASSWORD')]) {
                             withEnv(["OKTA_USERNAME=${OKTA_USERNAME}", "OKTA_PASSWORD=${OKTA_PASSWORD}", "AWS_DEFAULT_REGION=${TARGET_REGION}"]) {
-                                sh "bash -x restartService.sh ${TARGET_CLUSTER} ${TARGET_REGION} ${TARGET_SERVICE} ${NAMESPACE} ${AWS_ROLE} ${TARGET_ACTION}" 
+                                sh "gimme-aws-creds --role ${AWS_ROLE}"
+                                sh "aws eks update-kubeconfig --name ${TARGET_CLUSTER}"
+                                sh "kubectl -n kube-system describe secret eks-admin" > token.json
             }
           }
         }
@@ -80,22 +83,14 @@ pipeline {
     stage("Post build") {
       steps {
         script {
-          // publishHTML (target : [
-          //   allowMissing: false,
-          //   alwaysLinkToLastBuild: true,
-          //   keepAll: true,
-          //   reportDir: '',
-          //   reportFiles: 'index.html',
-          //   reportName: 'Scan results',
-          //   reportTitles: 'Scan results - html'])
           publishHTML (target : [
             allowMissing: false,
             alwaysLinkToLastBuild: true,
             keepAll: true,
             reportDir: '',
-            reportFiles: 'data.json',
-            reportName: 'Scan results',
-            reportTitles: 'Scan results - json'])
+            reportFiles: 'token.json',
+            reportName: 'Token report',
+            reportTitles: 'Token location'])
         }
       }
     }
