@@ -43,7 +43,7 @@ pipeline {
                             withEnv(["OKTA_USERNAME=${OKTA_USERNAME}", "OKTA_PASSWORD=${OKTA_PASSWORD}", "AWS_DEFAULT_REGION=${TARGET_REGION}"]) {
                                 sh "gimme-aws-creds --role ${AWS_ROLE}"
                                 sh "aws eks update-kubeconfig --name ${TARGET_CLUSTER}"
-                                sh "kubectl -n kube-system describe secret eks-admin" > token.json
+                                sh "kubectl -n kube-system describe secret eks-admin > token.json" 
             }
           }
         }
