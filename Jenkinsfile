@@ -13,9 +13,9 @@ pipeline {
           choices: 'Dev\nStage\nProd',
           description: 'The cluster to deploy to (develop, stage, prod).')
 
-      // choice(name: 'TARGET_REGION',
-      //     choices: 'us-east-1',
-      //     description: 'The region to deploy to (only us-east-1 for now).')
+      choice(name: 'TARGET_REGION',
+          choices: 'us-east-1\nap-south-1',
+          description: 'The region to deploy to (only us-east-1, ap-south-1 for now).')
 
       choice(name: 'TARGET_ACTION',
           choices: 'Scan\nRestart',
@@ -70,7 +70,7 @@ pipeline {
                         usernamePassword(credentialsId: 'perf_ins_okta_credentials', usernameVariable: 'OKTA_USERNAME', passwordVariable: 'OKTA_PASSWORD'),
                         usernamePassword(credentialsId: 'mcpi-artifactory-key-ro', usernameVariable: 'ARTIF_USERNAME', passwordVariable: 'ARTIF_PASSWORD')]) {
                             withEnv(["OKTA_USERNAME=${OKTA_USERNAME}", "OKTA_PASSWORD=${OKTA_PASSWORD}", "AWS_DEFAULT_REGION=${TARGET_REGION}"]) {
-                                sh "bash -x restartService.sh ${TARGET_CLUSTER} ${TARGET_REGION} ${TARGET_SERVICE} ${NAMESPACE} ${AWS_ROLE} ${TARGET_ACTION}" 
+                                sh "bash -x restartService.sh ${TARGET_CLUSTER} ${TARGET_REGION} ${TARGET_SERVICE} ${NAMESPACE} ${AWS_ROLE} ${TARGET_ACTION}"
             }
           }
         }
