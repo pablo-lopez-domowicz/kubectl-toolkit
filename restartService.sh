@@ -8,7 +8,7 @@ AWS_ROLE=$5
 ACTION=$6
 
 gimme-aws-creds --role $AWS_ROLE
-aws eks update-kubeconfig --name $CLUSTER
+aws eks update-kubeconfig --region $REGION --name $CLUSTER
 kubectl get pods -n $NAMESPACE
 kubectl get pods -n $NAMESPACE -o go-template-file=gotemplate.tmpl > index.html
 kubectl get pods -n $NAMESPACE -o json > data.json
