@@ -1,103 +1,88 @@
-// default options set to DEV env
-def AWS_ROLE="arn:aws:iam::927571343313:role/DevelopmentPerformanceInsights_Administrator"
-def NAMESPACE="dev"
-def TARGET_CLUSTER="pi-dev-eks"
-def TARGET_REGION="us-east-1"
+library "jenkinsci-unstashParam-library"
+
+def config = [
+    dev_us_east_1: [ 
+        awsRegion: 'us-east-1',
+        awsRole: 'arn:aws:iam::927571343313:role/DevelopmentPerformanceInsights_Administrator',
+        eksCluster: 'pi-dev-eks',
+        k8sNamespace: 'dev'
+    ],
+    staging_us_east_1: [ 
+        awsRegion: 'us-east-1',
+        awsRole: 'arn:aws:iam::404675694124:role/UAT_Administrator',
+        eksCluster: 'perf-insights-stage-eks',
+        k8sNamespace: 'staging-istio'
+    ],
+    prod_us_east_1: [ 
+        awsRegion: 'us-east-1',
+        awsRole: 'arn:aws:iam::379236661308:role/ProductionShared_Administrator',
+        eksCluster: 'perf-insights-prod-eks',
+        k8sNamespace: 'prod'
+    ],
+    prod_ap_south_1: [ 
+        awsRegion: 'ap-south-1',
+        awsRole: 'arn:aws:iam::379236661308:role/ProductionShared_Administrator',
+        eksCluster: 'perf-insights-prod-eks',
+        k8sNamespace: 'prod'
+    ],
+]
 
 pipeline {
-  agent {
+    agent {
         label 'mcpi-k8s-build'
     }
-  parameters {
-      choice(name: 'FRIENDLY_CLUSTER',
-          choices: 'Dev\nStage\nProd',
-          description: 'The cluster to deploy to (develop, stage, prod).')
 
-      choice(name: 'TARGET_REGION',
-          choices: 'us-east-1\nap-south-1',
-          description: 'The region to deploy to (only us-east-1, ap-south-1 for now).')
+    options {        
+        buildDiscarder(logRotator(numToKeepStr: '10'))
 
-      choice(name: 'TARGET_ACTION',
-          choices: 'Scan\nRestart',
-          description: 'Select an action (Scan or restart)')
-
-      choice(name: 'TARGET_SERVICE',
-              choices: """mcpi-ui\n
-                        aggregation-engine\n
-                        audience\n
-                        authentication\n
-                        data-generator\n
-                        data-location\n
-                        dimension\n
-                        provisioning\n
-                        query-engine\n
-                        ubx-audience-job\n
-                        ubx-client\n
-                        ubx-registration\n
-                        unique-fact\n
-                        warehouse-load\n
-                        warehouse-load-job\n
-                        warehouse-metadata\n
-                        workspace\n
-                        workspace-template\n
-                        """,
-              description: 'Service to restart')
-  }
-  stages {
-    stage('Setting vars') {
-      steps {
-        script {
-          if(env.FRIENDLY_CLUSTER.contains("Stage")){
-            AWS_ROLE="arn:aws:iam::404675694124:role/UAT_Administrator"
-            NAMESPACE="staging-istio"
-            TARGET_CLUSTER="perf-insights-stage-eks"
-          }
-          if(env.FRIENDLY_CLUSTER.contains("Prod")){
-            AWS_ROLE="arn:aws:iam::379236661308:role/ProductionShared_Administrator"
-            NAMESPACE="prod"
-            TARGET_CLUSTER="perf-insights-prod-eks"
-          }
-          currentBuild.displayName = "#${currentBuild.number}: ${TARGET_ACTION} - ${FRIENDLY_CLUSTER} - ${TARGET_SERVICE}"
-        }
-      }
+        ansiColor('xterm')
+        
+        timeout(time: 40, unit: 'MINUTES')
     }
 
-    stage("Executing") {
-      steps {
-        script {
-          sh """ echo "Cluster: ${TARGET_CLUSTER} - Region: ${TARGET_REGION} - Service: ${TARGET_SERVICE} -- AS: ${AWS_ROLE}" """
-          withCredentials([
-                        usernamePassword(credentialsId: 'perf_ins_okta_credentials', usernameVariable: 'OKTA_USERNAME', passwordVariable: 'OKTA_PASSWORD'),
-                        usernamePassword(credentialsId: 'mcpi-artifactory-key-ro', usernameVariable: 'ARTIF_USERNAME', passwordVariable: 'ARTIF_PASSWORD')]) {
-                            withEnv(["OKTA_USERNAME=${OKTA_USERNAME}", "OKTA_PASSWORD=${OKTA_PASSWORD}", "AWS_DEFAULT_REGION=${TARGET_REGION}"]) {
-                                sh "bash -x restartService.sh ${TARGET_CLUSTER} ${TARGET_REGION} ${TARGET_SERVICE} ${NAMESPACE} ${AWS_ROLE} ${TARGET_ACTION}"
+    parameters {
+        choice(name: 'ENV', choices: ['', 'dev_us_east_1', 'staging_us_east_1', 'prod_us_east_1', 'prod_ap_south_1'], description: 'Environment for run')
+    		string(name: 'CONTACT_ID', defaultValue: '', description: 'Contact id for this run')
+    		string(name: 'REDIS_NAME', defaultValue: '', description: 'RedisName for this run')
+    }
+
+    environment {
+        AWS_DEFAULT_REGION="${config.get(env.ENV)['awsRegion']}"
+        EKS_NAMESPACE="${config.get(env.ENV)['k8sNamespace']}"
+        CONTACT_ID="${env.CONTACT_ID}"
+        REDIS_NAME="${env.REDIS_NAME}"
+        // Add okta credentials for gimme-aws-creds auth 
+        OKTA = credentials('perf_ins_okta_credentials')
+        OKTA_USERNAME="${OKTA_USR}"
+        OKTA_PASSWORD="${OKTA_PSW}"        
+    }
+
+    stages {
+        stage('Audience') {
+            steps {
+                script {
+                    // Authorize to aws account with okta creds
+                    sh "gimme-aws-creds --role ${config.get(env.ENV)['awsRole']}"
+                    
+                    // Authorzie to kubectl
+                    sh "aws eks update-kubeconfig --name ${config.get(env.ENV)['eksCluster']}"
+
+                    sh '''#!/bin/bash
+                            audience_pod=$(kubectl -n $EKS_NAMESPACE get po -o=name | grep -m 1 audience | sed 's/^.\\{4\\}//')
+                                    if [ -z "$audience_pod" ]
+                                    then
+                                          echo "Cannot find any audience pods in namespace $EKS_NAMESPACE"
+                                          exit 1
+                                    fi  
+                						echo "Contact ID Used: "$CONTACT_ID
+                						echo "RedisName Used: "$REDIS_NAME
+                              kubectl -n $EKS_NAMESPACE -c audience exec $audience_pod \
+                                -- curl -s "http://localhost:8080/private/audience/members?redisName=${REDIS_NAME}&contactId=${CONTACT_ID}" \
+                                --header 'Content-Type:application/json' 
+                        '''
+                }
             }
-          }
         }
-      }
     }
 
-    stage("Post build") {
-      steps {
-        script {
-          // publishHTML (target : [
-          //   allowMissing: false,
-          //   alwaysLinkToLastBuild: true,
-          //   keepAll: true,
-          //   reportDir: '',
-          //   reportFiles: 'index.html',
-          //   reportName: 'Scan results',
-          //   reportTitles: 'Scan results - html'])
-          publishHTML (target : [
-            allowMissing: false,
-            alwaysLinkToLastBuild: true,
-            keepAll: true,
-            reportDir: '',
-            reportFiles: 'data.json',
-            reportName: 'Scan results',
-            reportTitles: 'Scan results - json'])
-        }
-      }
-    }
-  }
 }
