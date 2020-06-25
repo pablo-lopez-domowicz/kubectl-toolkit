@@ -76,9 +76,9 @@ pipeline {
                                     fi  
                 						echo "Contact ID Used: "$CONTACT_ID
                 						echo "RedisName Used: "$REDIS_NAME
-                              kubectl -n $EKS_NAMESPACE -c audience exec $audience_pod \
-                                -- curl -s "http://localhost:8080/private/audience/members?redisName=${REDIS_NAME}&contactId=${CONTACT_ID}" \
-                                --header 'Content-Type:application/json' 
+                            kubectl -n $EKS_NAMESPACE -c audience exec $audience_pod \
+                              -- curl -s "http://localhost:8080/private/audience/members?redisName=${REDIS_NAME}&contactId=${CONTACT_ID}" \
+                              --header 'Content-Type:application/json' > response.json 
                         '''
                 }
             }
