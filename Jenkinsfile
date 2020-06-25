@@ -42,8 +42,8 @@ pipeline {
 
     parameters {
         choice(name: 'ENV', choices: ['', 'dev_us_east_1', 'staging_us_east_1', 'prod_us_east_1', 'prod_ap_south_1'], description: 'Environment for run')
-    		string(name: 'CONTACT_ID', defaultValue: '', description: 'Contact id for this run')
-    		string(name: 'REDIS_NAME', defaultValue: '', description: 'RedisName for this run')
+    		string(name: 'CONTACT_ID', defaultValue: '95132156-864c-40f0-88ba-98b369283800', description: 'Contact id for this run')
+    		string(name: 'REDIS_NAME', defaultValue: 'audience:495680:2020.01.28.19.27', description: 'RedisName for this run')
     }
 
     environment {
@@ -78,7 +78,7 @@ pipeline {
                 						echo "RedisName Used: "$REDIS_NAME
                             kubectl -n $EKS_NAMESPACE -c audience exec $audience_pod \
                               -- curl -s "http://localhost:8080/private/audience/members?redisName=${REDIS_NAME}&contactId=${CONTACT_ID}" \
-                              --header 'Content-Type:application/json' > response.json 
+                              --header 'Content-Type:application/json' done < response.json
                         '''
                 }
             }
@@ -92,8 +92,8 @@ pipeline {
             keepAll: true,
             reportDir: '',
             reportFiles: 'response.json',
-            reportName: 'Response',
-            reportTitles: 'Response'])
+            reportName: 'jobResponse',
+            reportTitles: 'jobResponse'])
         }
       }
     }
