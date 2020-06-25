@@ -83,6 +83,20 @@ pipeline {
                 }
             }
         }
+    stage("Post build") {
+      steps {
+        script {
+          publishHTML (target : [
+            allowMissing: false,
+            alwaysLinkToLastBuild: true,
+            keepAll: true,
+            reportDir: '',
+            reportFiles: 'response.json',
+            reportName: 'Response',
+            reportTitles: 'Response'])
+        }
+      }
+    }
     }
 
 }
