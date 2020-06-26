@@ -1,6 +1,0 @@
-Start 
-1 - ClientId: CpGoGej1ScNlm43IwWHOahPmtytCHnA5qERuq0Ds1 - OK
-2 - ClientId: CpGoGej1ScNlm43IwWHOahPmtytCHnA5qERuq0Ds2 - OK
-3 - ClientId: CpGoGej1ScNlm43IwWHOahPmtytCHnA5qERuq0Ds3 - OK
-4 - ClientId: CpGoGej1ScNlm43IwWHOahPmtytCHnA5qERuq0Ds4 - OK
-5 - ClientId: CpGoGej1ScNlm43IwWHOahPmtytCHnA5qERuq0DXZZZ - {"errorMessage":"Contact not found in bloomfilter with given params.","errorCode":404}
