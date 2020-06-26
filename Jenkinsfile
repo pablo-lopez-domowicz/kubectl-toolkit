@@ -65,9 +65,7 @@ pipeline {
                     // Authorzie to kubectl
                     sh "aws eks update-kubeconfig --name ${config.get(env.ENV)['eksCluster']}"
 
-                    sh '''#!/bin/bash
-                            sh findCliendId.sh 
-                        '''
+                    sh "bash -x findCliendId.sh"
                 }
             }
         }
