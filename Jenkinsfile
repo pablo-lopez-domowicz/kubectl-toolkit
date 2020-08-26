@@ -25,6 +25,7 @@ pipeline {
                         aggregation-engine\n
                         audience\n
                         authentication\n
+                        epam\n
                         data-generator\n
                         data-location\n
                         dimension\n
