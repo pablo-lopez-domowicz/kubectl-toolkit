@@ -29,8 +29,11 @@ pipeline {
                         data-generator\n
                         data-location\n
                         dimension\n
+                        fitnesse\n                        
+                        kafka-monitor\n
                         provisioning\n
                         query-engine\n
+                        redis-monitor\n
                         ubx-audience-job\n
                         ubx-client\n
                         ubx-registration\n
